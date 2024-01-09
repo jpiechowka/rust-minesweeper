@@ -1,0 +1,27 @@
+[package]
+name = "rust-minesweeper"
+version = "0.1.0"
+edition = "2021"
+authors = ["Janusz Piechówka"]
+repository = "https://github.com/jpiechowka/rust-minesweeper"
+license = "MIT OR Apache-2.0"
+description = "Minesweeper in Rust and Bevy"
+readme = "README.md"
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+# Release optimizations
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
+panic = "abort"
+
+[dependencies]
+bevy = "0.12"
