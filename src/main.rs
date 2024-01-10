@@ -1,3 +1,4 @@
+#[cfg(feature = "debug")]
 use std::time::Duration;
 
 #[cfg(feature = "debug")]
