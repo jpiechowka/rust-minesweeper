@@ -8,6 +8,7 @@ use bevy::window::{PresentMode, WindowTheme};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use crate::components::Coordinates;
+use crate::plugins::BoardPlugin;
 use crate::systems::setup_2d_camera;
 
 mod components;
@@ -41,6 +42,8 @@ fn main() {
         ..default()
     }));
 
+    app.add_plugins(BoardPlugin);
+
     #[cfg(feature = "debug")]
     add_debug_plugins(&mut app);
 
@@ -48,7 +51,6 @@ fn main() {
     register_custom_types_for_bevy_inspector_egui(&mut app);
 
     app.add_systems(Startup, setup_2d_camera);
-
     app.run();
 }
 
