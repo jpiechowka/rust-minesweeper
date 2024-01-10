@@ -17,6 +17,8 @@ TODO: Fill this list
 
 You can run the debug build using `debug` feature flag with:
 ```
+git clone https://github.com/jpiechowka/rust-minesweeper.git
+cd rust-minesweeper
 cargo run --package rust-minesweeper --bin rust-minesweeper --features debug
 ```
 
