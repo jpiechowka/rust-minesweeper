@@ -1,4 +1,4 @@
-use bevy::prelude::{info, Camera2dBundle, Commands, Component};
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Minesweeper2dCamera;

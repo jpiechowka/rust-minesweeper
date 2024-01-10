@@ -7,8 +7,10 @@ use bevy::window::{PresentMode, WindowTheme};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+use crate::components::Coordinates;
 use crate::systems::setup_2d_camera;
 
+mod components;
 mod systems;
 
 const WINDOW_TITLE: &str = "Rust Minesweeper";
@@ -40,6 +42,9 @@ fn main() {
     #[cfg(feature = "debug")]
     add_debug_plugins(&mut app);
 
+    #[cfg(feature = "debug")]
+    register_custom_types_for_bevy_inspector_egui(&mut app);
+
     app.add_systems(Startup, setup_2d_camera);
 
     app.run();
@@ -54,4 +59,10 @@ fn add_debug_plugins(app: &mut App) {
         ..default()
     });
     app.add_plugins(WorldInspectorPlugin::new());
+}
+
+#[cfg(feature = "debug")]
+fn register_custom_types_for_bevy_inspector_egui(app: &mut App) {
+    info!("Registering custom types for Bevy Inspector EGUI");
+    app.register_type::<Coordinates>();
 }
