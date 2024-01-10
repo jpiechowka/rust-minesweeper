@@ -11,6 +11,7 @@ use crate::components::Coordinates;
 use crate::systems::setup_2d_camera;
 
 mod components;
+mod resources;
 mod systems;
 
 const WINDOW_TITLE: &str = "Rust Minesweeper";
