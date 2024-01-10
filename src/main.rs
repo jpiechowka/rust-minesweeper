@@ -1,12 +1,15 @@
-use bevy::prelude::*;
-use bevy::window::{PresentMode, WindowTheme};
 use std::time::Duration;
 
 #[cfg(feature = "debug")]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-
+use bevy::prelude::*;
+use bevy::window::{PresentMode, WindowTheme};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+
+use crate::systems::setup_2d_camera;
+
+mod systems;
 
 const WINDOW_TITLE: &str = "Rust Minesweeper";
 const INITIAL_RESOLUTION_X: u16 = 800;
@@ -36,6 +39,8 @@ fn main() {
 
     #[cfg(feature = "debug")]
     add_debug_plugins(&mut app);
+
+    app.add_systems(Startup, setup_2d_camera);
 
     app.run();
 }
