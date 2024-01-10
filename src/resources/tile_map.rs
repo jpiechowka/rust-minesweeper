@@ -130,7 +130,7 @@ impl TileMap {
     #[cfg(feature = "debug")]
     pub fn console_output(&self) -> String {
         let mut buffer: String = format!(
-            "Map ({}, {}) with {} mines:\n\n",
+            "Map ({}, {}) with {} mines:\n",
             self.width, self.height, self.mine_count
         );
 
