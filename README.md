@@ -9,6 +9,7 @@ TODO: Fill this list
 ## Learning resources
 
 * https://dev.to/qongzi/series/16975
+* https://github.com/leonidv/bevy-minesweeper-tutorial
 * https://bevyengine.org/learn/book/getting-started/
 * https://bevy-cheatbook.github.io/
 * https://nnethercote.github.io/perf-book/introduction.html
