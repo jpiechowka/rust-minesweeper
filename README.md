@@ -1,6 +1,8 @@
-# Rust Minesweeper
+# Rust Minesweeper <img src="icons\Bomb-Icon-256.png" height="32" width="32"/>
 
 Minesweeper in Rust and Bevy
+
+Based on the Minesweeper tutorial series [here](https://dev.to/qongzi/series/16975) and adapted to the latest Bevy version (`0.12`)
 
 ## Features
 
