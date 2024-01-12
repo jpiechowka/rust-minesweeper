@@ -11,6 +11,7 @@ use bevy::winit::WinitWindows;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use winit::window::Icon;
 
+#[cfg(feature = "debug")]
 use crate::components::Coordinates;
 use crate::plugins::BoardPlugin;
 use crate::resources::BoardOptions;
