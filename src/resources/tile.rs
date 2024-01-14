@@ -23,7 +23,9 @@ impl Tile {
                     1 => "1".cyan(),
                     2 => "2".green(),
                     3 => "3".yellow(),
-                    _ => v.to_string().red(),
+                    4 => "4".truecolor(255, 140, 0), // dark orange
+                    5 => "5".red(),
+                    _ => v.to_string().purple(),
                 },
                 Self::Empty => " ".normal(),
             }
