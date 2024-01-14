@@ -12,7 +12,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use winit::window::Icon;
 
 #[cfg(feature = "debug")]
-use crate::components::Coordinates;
+use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
 use crate::plugins::BoardPlugin;
 use crate::resources::BoardOptions;
 use crate::systems::{make_window_visible_after_startup, setup_2d_camera, toggle_vsync};
@@ -24,7 +24,7 @@ mod systems;
 
 const WINDOW_TITLE: &str = "Rust Minesweeper";
 const INITIAL_RESOLUTION_X: u16 = 800;
-const INITIAL_RESOLUTION_Y: u16 = 600;
+const INITIAL_RESOLUTION_Y: u16 = 800;
 
 fn main() {
     let mut app = App::new();
@@ -112,4 +112,7 @@ fn add_debug_plugins(app: &mut App) {
 fn register_custom_types_for_bevy_inspector_egui(app: &mut App) {
     info!("Registering custom types for Bevy Inspector EGUI");
     app.register_type::<Coordinates>();
+    app.register_type::<Mine>();
+    app.register_type::<MineNeighbor>();
+    app.register_type::<Uncover>();
 }
