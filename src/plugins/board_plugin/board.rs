@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 use crate::components::{Coordinates, Mine, MineNeighbor};
-use crate::resources::{BoardOptions, BoardPosition, Tile, TileMap, TileSize};
+use crate::plugins::Bounds2;
+use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
 
 pub struct BoardPlugin;
 
@@ -93,6 +94,15 @@ impl BoardPlugin {
                     font,
                 );
             });
+
+        commands.insert_resource(Board {
+            tile_map,
+            bounds: Bounds2 {
+                position: board_position.xy(),
+                size: board_size,
+            },
+            tile_size,
+        });
     }
 
     fn spawn_tiles(

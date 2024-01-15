@@ -1,3 +1,4 @@
-pub use board::BoardPlugin;
+pub use board_plugin::BoardPlugin;
+pub use board_plugin::Bounds2;
 
-mod board;
+mod board_plugin;
