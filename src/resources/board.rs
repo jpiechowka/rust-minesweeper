@@ -23,7 +23,8 @@ impl Board {
         let coordinates = position - self.bounds.position;
         Some(Coordinates {
             x: (coordinates.x / self.tile_size) as u16,
-            y: (coordinates.y / self.tile_size) as u16,
+            // https://bevyengine.org/learn/migration-guides/0.10-0.11/#consistent-screen-space-coordinates
+            y: self.tile_map.height() - 1 - (coordinates.y / self.tile_size) as u16,
         })
     }
 }
