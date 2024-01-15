@@ -10,6 +10,7 @@ TODO: Fill this list
 
 * Rust Minesweeper clone adapted from tutorial [here](https://dev.to/qongzi/series/16975) to Bevy 0.12
 * Assets and icons created using `Aseprite` (https://github.com/aseprite/aseprite). To build from source see this guide: https://gist.github.com/luciopaiva/6a1f870f932a5f54011cc869c4d558a8
+* Played a little bit with [JetBrains AI assistant](https://www.jetbrains.com/ai/) for documentation, code generation and commit messages completion
 
 ## Learning resources
 
