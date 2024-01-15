@@ -1,13 +1,17 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 
 use crate::components::{Coordinates, Mine, MineNeighbor};
-use crate::resources::{BoardOptions, BoardPosition, Tile, TileMap, TileSize};
+use crate::plugins::Bounds2;
+use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
+use crate::systems::handle_mouse_input;
 
 pub struct BoardPlugin;
 
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, Self::create_board);
+        app.add_systems(Update, handle_mouse_input);
         info!("Loaded Board Plugin");
     }
 }
@@ -16,10 +20,10 @@ impl BoardPlugin {
     pub fn create_board(
         mut commands: Commands,
         board_options: Option<Res<BoardOptions>>,
-        windows: Query<&Window>,
+        window_query: Query<&Window, With<PrimaryWindow>>,
         asset_server: Res<AssetServer>,
     ) {
-        let window = windows.single();
+        let window = window_query.single();
 
         info!("Loading assets");
         let font: Handle<Font> = asset_server.load("fonts/symtext/Symtext.ttf");
@@ -93,6 +97,15 @@ impl BoardPlugin {
                     font,
                 );
             });
+
+        commands.insert_resource(Board {
+            tile_map,
+            bounds: Bounds2 {
+                position: board_position.xy(),
+                size: board_size,
+            },
+            tile_size,
+        });
     }
 
     fn spawn_tiles(
