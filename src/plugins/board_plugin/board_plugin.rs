@@ -3,9 +3,9 @@ use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
 
 use crate::components::{Coordinates, Mine, MineNeighbor};
-use crate::plugins::Bounds2;
+use crate::plugins::{Bounds2, TileTriggerEvent};
 use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
-use crate::systems::handle_mouse_input;
+use crate::systems::{handle_mouse_input, trigger_event_handler, uncover_tiles};
 
 pub struct BoardPlugin;
 
@@ -13,6 +13,9 @@ impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, Self::create_board);
         app.add_systems(Update, handle_mouse_input);
+        app.add_systems(Update, trigger_event_handler);
+        app.add_systems(Update, uncover_tiles);
+        app.add_event::<TileTriggerEvent>();
         info!("Loaded Board Plugin");
     }
 }
@@ -97,7 +100,7 @@ impl BoardPlugin {
                     tile_size,
                     options.tile_padding,
                     Color::DARK_GRAY,
-                    Color::DARK_GRAY,
+                    Color::GRAY,
                     &mut covered_tiles,
                     mine_sprite,
                     font,
