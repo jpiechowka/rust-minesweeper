@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
 
 use crate::components::{Coordinates, Mine, MineNeighbor};
@@ -61,6 +62,9 @@ impl BoardPlugin {
             BoardPosition::CustomPosition(pos) => pos,
         };
 
+        let mut covered_tiles =
+            HashMap::with_capacity((tile_map.width() * tile_map.height()).into());
+
         info!("Spawning board");
         commands
             .spawn((
@@ -93,6 +97,8 @@ impl BoardPlugin {
                     tile_size,
                     options.tile_padding,
                     Color::DARK_GRAY,
+                    Color::DARK_GRAY,
+                    &mut covered_tiles,
                     mine_sprite,
                     font,
                 );
@@ -105,6 +111,7 @@ impl BoardPlugin {
                 size: board_size,
             },
             tile_size,
+            covered_tiles,
         });
     }
 
@@ -114,11 +121,18 @@ impl BoardPlugin {
         tile_size: f32,
         tile_padding: f32,
         background_color: Color,
+        covered_tile_color: Color,
+        covered_tiles: &mut HashMap<Coordinates, Entity>,
         mine_sprite: Handle<Image>,
         font: Handle<Font>,
     ) {
         for (y, line) in tile_map.iter().enumerate() {
             for (x, tile) in line.iter().enumerate() {
+                let coordinates = Coordinates {
+                    x: x as u16,
+                    y: y as u16,
+                };
+
                 let mut commands = parent.spawn(SpriteBundle {
                     sprite: Sprite {
                         color: background_color,
@@ -135,10 +149,23 @@ impl BoardPlugin {
 
                 commands
                     .insert(Name::new(format!("Tile ({}, {})", x, y)))
-                    .insert(Coordinates {
-                        x: x as u16,
-                        y: y as u16,
-                    });
+                    .insert(coordinates);
+
+                commands.with_children(|parent| {
+                    let entity = parent
+                        .spawn(SpriteBundle {
+                            sprite: Sprite {
+                                custom_size: Some(Vec2::splat(tile_size - tile_padding)),
+                                color: covered_tile_color,
+                                ..default()
+                            },
+                            transform: Transform::from_xyz(0f32, 0f32, 2f32),
+                            ..default()
+                        })
+                        .insert(Name::new("Tile Cover"))
+                        .id();
+                    covered_tiles.insert(coordinates, entity);
+                });
 
                 match tile {
                     Tile::Mine => {
