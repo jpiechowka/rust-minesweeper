@@ -60,8 +60,9 @@ fn main() {
 
     app.insert_resource(BoardOptions {
         map_size: (20, 20),
-        mine_count: 40,
+        mine_count: 60,
         tile_padding: 3.0,
+        safe_start_enabled: true,
         ..default()
     });
 
