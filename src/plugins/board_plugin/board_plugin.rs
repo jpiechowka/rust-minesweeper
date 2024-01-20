@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
 
-use crate::components::{Coordinates, Mine, MineNeighbor};
+use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
 use crate::plugins::{Bounds2, TileTriggerEvent};
 use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
 use crate::systems::{handle_mouse_input, trigger_event_handler, uncover_tiles};
@@ -68,6 +68,8 @@ impl BoardPlugin {
         let mut covered_tiles =
             HashMap::with_capacity((tile_map.width() * tile_map.height()).into());
 
+        let mut safe_start = None;
+
         info!("Spawning board");
         commands
             .spawn((
@@ -81,7 +83,7 @@ impl BoardPlugin {
                 parent
                     .spawn(SpriteBundle {
                         sprite: Sprite {
-                            color: Color::ANTIQUE_WHITE,
+                            color: Color::BLACK,
                             custom_size: Some(board_size),
                             ..default()
                         },
@@ -104,8 +106,15 @@ impl BoardPlugin {
                     &mut covered_tiles,
                     mine_sprite,
                     font,
+                    &mut safe_start,
                 );
             });
+
+        if options.safe_start_enabled {
+            if let Some(entity) = safe_start {
+                commands.entity(entity).insert(Uncover);
+            }
+        }
 
         commands.insert_resource(Board {
             tile_map,
@@ -128,6 +137,7 @@ impl BoardPlugin {
         covered_tiles: &mut HashMap<Coordinates, Entity>,
         mine_sprite: Handle<Image>,
         font: Handle<Font>,
+        safe_start_entity: &mut Option<Entity>,
     ) {
         for (y, line) in tile_map.iter().enumerate() {
             for (x, tile) in line.iter().enumerate() {
@@ -168,6 +178,10 @@ impl BoardPlugin {
                         .insert(Name::new("Tile Cover"))
                         .id();
                     covered_tiles.insert(coordinates, entity);
+
+                    if safe_start_entity.is_none() && *tile == Tile::Empty {
+                        *safe_start_entity = Some(entity);
+                    }
                 });
 
                 match tile {
