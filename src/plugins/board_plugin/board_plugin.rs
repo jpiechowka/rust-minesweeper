@@ -6,21 +6,31 @@ use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
 use crate::plugins::{Bounds2, TileTriggerEvent};
 use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
 use crate::systems::{handle_mouse_input, trigger_event_handler, uncover_tiles};
+use crate::AppState;
 
-pub struct BoardPlugin;
+pub struct BoardPlugin<T> {
+    pub running_state: T,
+}
 
-impl Plugin for BoardPlugin {
+impl<T: States> Plugin for BoardPlugin<T> {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, Self::create_board);
-        app.add_systems(Update, handle_mouse_input);
-        app.add_systems(Update, trigger_event_handler);
-        app.add_systems(Update, uncover_tiles);
+        app.add_systems(OnEnter(self.running_state.clone()), Self::create_board);
+
+        app.add_systems(
+            Update,
+            (handle_mouse_input, trigger_event_handler, uncover_tiles)
+                .run_if(in_state(AppState::InGame)),
+        );
+
+        app.add_systems(OnExit(self.running_state.clone()), Self::cleanup_board);
+
         app.add_event::<TileTriggerEvent>();
+
         info!("Loaded Board Plugin");
     }
 }
 
-impl BoardPlugin {
+impl<T: States> BoardPlugin<T> {
     pub fn create_board(
         mut commands: Commands,
         board_options: Option<Res<BoardOptions>>,
@@ -71,7 +81,7 @@ impl BoardPlugin {
         let mut safe_start = None;
 
         info!("Spawning board");
-        commands
+        let board_entity = commands
             .spawn((
                 Name::new("Board"),
                 SpatialBundle {
@@ -108,7 +118,8 @@ impl BoardPlugin {
                     font,
                     &mut safe_start,
                 );
-            });
+            })
+            .id();
 
         if options.safe_start_enabled {
             if let Some(entity) = safe_start {
@@ -124,6 +135,7 @@ impl BoardPlugin {
             },
             tile_size,
             covered_tiles,
+            entity: board_entity,
         });
     }
 
@@ -249,5 +261,10 @@ impl BoardPlugin {
         let max_width = window.resolution.width() / width as f32;
         let max_height = window.resolution.height() / height as f32;
         max_width.min(max_height).clamp(min, max)
+    }
+
+    fn cleanup_board(board: Res<Board>, mut commands: Commands) {
+        info!("Performing recursive despawn of entities");
+        commands.entity(board.entity).despawn_recursive();
     }
 }

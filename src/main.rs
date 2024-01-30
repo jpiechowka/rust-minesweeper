@@ -4,9 +4,13 @@ use std::time::Duration;
 
 #[cfg(feature = "debug")]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+#[cfg(feature = "debug")]
+use bevy::prelude::Reflect;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, PrimaryWindow, WindowTheme};
 use bevy::winit::WinitWindows;
+#[cfg(feature = "debug")]
+use bevy_inspector_egui::prelude::*;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use winit::window::Icon;
@@ -25,6 +29,15 @@ mod systems;
 const WINDOW_TITLE: &str = "Rust Minesweeper";
 const INITIAL_RESOLUTION_X: u16 = 800;
 const INITIAL_RESOLUTION_Y: u16 = 800;
+
+#[cfg_attr(feature = "debug", derive(Reflect, InspectorOptions))]
+#[cfg_attr(feature = "debug", reflect(InspectorOptions))]
+#[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, States)]
+pub enum AppState {
+    #[default]
+    InGame,
+    Out,
+}
 
 fn main() {
     let mut app = App::new();
@@ -66,12 +79,16 @@ fn main() {
         ..default()
     });
 
-    app.add_plugins(BoardPlugin);
+    app.add_state::<AppState>();
+    app.add_plugins(BoardPlugin {
+        running_state: AppState::InGame,
+    });
 
     app.add_systems(Startup, set_window_icon);
     app.add_systems(Startup, setup_2d_camera);
     app.add_systems(Update, make_window_visible_after_startup);
     app.add_systems(Update, toggle_vsync);
+    app.add_systems(Update, state_handler);
 
     app.run();
 }
@@ -116,4 +133,30 @@ fn register_custom_types_for_bevy_inspector_egui(app: &mut App) {
     app.register_type::<Mine>();
     app.register_type::<MineNeighbor>();
     app.register_type::<Uncover>();
+}
+
+fn state_handler(
+    current_state: Res<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
+    keys: Res<Input<KeyCode>>,
+) {
+    if keys.just_pressed(KeyCode::C) {
+        info!("[C] key pressed. Attempting to clear the board");
+        if current_state.get() == &AppState::InGame {
+            info!("Clearing the board");
+            next_state.set(AppState::Out);
+        } else {
+            warn!("Wrong state detected. Game was already cleared before. Press 'R' to regenerate the board")
+        }
+    }
+
+    if keys.just_pressed(KeyCode::R) {
+        info!("[R] key pressed. Attempting to regenerate the board");
+        if current_state.get() == &AppState::Out {
+            info!("Regenerating the game board");
+            next_state.set(AppState::InGame);
+        } else {
+            warn!("Wrong state detected. Clear the board with 'C' before regenerating the board")
+        }
+    }
 }

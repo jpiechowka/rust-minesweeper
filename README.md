@@ -7,6 +7,7 @@ version (`0.12`)
 
 <!-- TOC -->
 * [Rust Minesweeper](#rust-minesweeper)
+  * [Key mappings](#key-mappings)
   * [Features](#features)
   * [Learning resources](#learning-resources)
   * [Running the debug build](#running-the-debug-build)
@@ -17,9 +18,13 @@ version (`0.12`)
   * [Contributions](#contributions)
 <!-- TOC -->
 
-## Features
+## Key mappings
 
-TODO: Fill this list
+* `C`: clear board
+* `V`: toggle V-Sync (on / off)
+* `R`: (re)generate new board (requires clearing the board first)
+
+## Features
 
 * Rust Minesweeper clone adapted from tutorial [here](https://dev.to/qongzi/series/16975) to Bevy 0.12
 * Assets and icons created using `Aseprite` (https://github.com/aseprite/aseprite). To build from source see this
