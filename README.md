@@ -6,16 +6,16 @@ Based on the Minesweeper tutorial series [here](https://dev.to/qongzi/series/169
 version (`0.12`)
 
 <!-- TOC -->
-* [Rust Minesweeper](#rust-minesweeper)
-  * [Key mappings](#key-mappings)
-  * [Features](#features)
-  * [Learning resources](#learning-resources)
-  * [Running the debug build](#running-the-debug-build)
-  * [Building](#building)
-    * [Using `RUSTFLAGS` env variable](#using-rustflags-env-variable)
-  * [Gallery](#gallery)
-  * [License](#license)
-  * [Contributions](#contributions)
+- [Rust Minesweeper](#rust-minesweeper)
+  - [Key mappings](#key-mappings)
+  - [Features](#features)
+  - [Learning resources](#learning-resources)
+  - [Running the debug build](#running-the-debug-build)
+  - [Building](#building)
+    - [Using `RUSTFLAGS` env variable](#using-rustflags-env-variable)
+  - [Gallery](#gallery)
+  - [License](#license)
+  - [Contributions](#contributions)
 <!-- TOC -->
 
 ## Key mappings
@@ -32,7 +32,7 @@ version (`0.12`)
 * Additional debug console logging and `bevy-inspector-egui` can be enabled using the `debug` feature
   (see: [Running the debug build section](#running-the-debug-build))
 * Played a little bit with [JetBrains AI assistant](https://www.jetbrains.com/ai/) for documentation, code generation
-  and commit messages completion
+  and commit messages completion. Later gave [GitHub Copilot](https://github.com/features/copilot) a try in VSCode.
 
 ## Learning resources
 
@@ -88,7 +88,15 @@ On Windows you need to follow this pattern: https://superuser.com/a/1049433
 
 ## Gallery
 
-TODO: Provide some pictures or video of the final game
+* Main game window
+
+   <img src="readme/main-window.png" alt="Debug Console" width="800">
+
+* Debug feature enabled (showing additional debug console logs and inspector window)
+
+   <img src="readme/debug-console.png" alt="Debug Console" width="800">
+
+   <img src="readme/debug-inspector.png" alt="Debug Inspector" width="800">
 
 ## License
 
