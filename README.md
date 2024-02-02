@@ -90,7 +90,11 @@ On Windows you need to follow this pattern: https://superuser.com/a/1049433
 
 * Main game window
 
-   <img src="readme/main-window.png" alt="Debug Console" width="800">
+   <img src="readme/main-window.png" alt="Main Window" width="800">
+
+* Marking tiles
+
+   <img src="readme/marking-tiles.png" alt="Marking Tiles" width="800">
 
 * Debug feature enabled (showing additional debug console logs and inspector window)
 
