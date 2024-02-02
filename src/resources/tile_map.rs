@@ -123,6 +123,10 @@ impl TileMap {
         self.height
     }
 
+    pub fn mine_count(&self) -> u16 {
+        self.mine_count
+    }
+
     #[cfg(feature = "debug")]
     pub fn console_output(&self) -> String {
         let mut buffer: String = format!(

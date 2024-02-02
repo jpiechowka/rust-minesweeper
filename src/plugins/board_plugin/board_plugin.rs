@@ -3,9 +3,11 @@ use bevy::utils::HashMap;
 use bevy::window::PrimaryWindow;
 
 use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
-use crate::plugins::{Bounds2, TileTriggerEvent};
+use crate::plugins::{
+    BoardCompletedEvent, Bounds2, MineExplosionEvent, TileMarkEvent, TileTriggerEvent,
+};
 use crate::resources::{Board, BoardAssets, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
-use crate::systems::{handle_mouse_input, trigger_event_handler, uncover_tiles};
+use crate::systems::{handle_mouse_input, mark_tiles, trigger_event_handler, uncover_tiles};
 use crate::AppState;
 
 pub struct BoardPlugin<T> {
@@ -18,13 +20,21 @@ impl<T: States> Plugin for BoardPlugin<T> {
 
         app.add_systems(
             Update,
-            (handle_mouse_input, trigger_event_handler, uncover_tiles)
+            (
+                handle_mouse_input,
+                trigger_event_handler,
+                uncover_tiles,
+                mark_tiles,
+            )
                 .run_if(in_state(AppState::InGame)),
         );
 
         app.add_systems(OnExit(self.running_state.clone()), Self::cleanup_board);
 
         app.add_event::<TileTriggerEvent>();
+        app.add_event::<TileMarkEvent>();
+        app.add_event::<MineExplosionEvent>();
+        app.add_event::<BoardCompletedEvent>();
 
         info!("Loaded Board Plugin");
     }
@@ -130,6 +140,7 @@ impl<T: States> BoardPlugin<T> {
             tile_size,
             covered_tiles,
             entity: board_entity,
+            marked_tiles: Vec::new(),
         });
     }
 
