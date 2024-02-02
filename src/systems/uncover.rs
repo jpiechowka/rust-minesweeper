@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
-use crate::plugins::TileTriggerEvent;
+use crate::plugins::{BoardCompletedEvent, MineExplosionEvent, TileTriggerEvent};
 use crate::resources::Board;
 
 pub fn trigger_event_handler(
@@ -22,6 +22,8 @@ pub fn uncover_tiles(
     mut board: ResMut<Board>,
     children: Query<(Entity, &Parent), With<Uncover>>,
     parents: Query<(&Coordinates, Option<&Mine>, Option<&MineNeighbor>)>,
+    mut board_completed_event_writer: EventWriter<BoardCompletedEvent>,
+    mut mine_explosion_event_writer: EventWriter<MineExplosionEvent>,
 ) {
     for (entity, parent) in children.iter() {
         commands.entity(entity).despawn_recursive();
@@ -39,9 +41,14 @@ pub fn uncover_tiles(
             Some(e) => info!("Uncovered tile {} (entity: {:?})", coordinates, e),
         }
 
+        if board.is_completed() {
+            info!("Board completed!");
+            board_completed_event_writer.send(BoardCompletedEvent);
+        }
+
         if mine.is_some() {
             info!("Boom!");
-            // TODO: Add explosion event
+            mine_explosion_event_writer.send(MineExplosionEvent);
         } else if mine_counter.is_none() {
             for entity in board.adjacent_covered_tiles(*coordinates) {
                 commands.entity(entity).insert(Uncover);
