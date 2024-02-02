@@ -26,7 +26,7 @@ pub fn uncover_tiles(
     for (entity, parent) in children.iter() {
         commands.entity(entity).despawn_recursive();
 
-        let (coordinates, bomb, bomb_counter) = match parents.get(parent.get()) {
+        let (coordinates, mine, mine_counter) = match parents.get(parent.get()) {
             Ok(v) => v,
             Err(e) => {
                 error!("{}", e);
@@ -39,10 +39,10 @@ pub fn uncover_tiles(
             Some(e) => info!("Uncovered tile {} (entity: {:?})", coordinates, e),
         }
 
-        if bomb.is_some() {
+        if mine.is_some() {
             info!("Boom!");
             // TODO: Add explosion event
-        } else if bomb_counter.is_none() {
+        } else if mine_counter.is_none() {
             for entity in board.adjacent_covered_tiles(*coordinates) {
                 commands.entity(entity).insert(Uncover);
             }

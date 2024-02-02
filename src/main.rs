@@ -13,6 +13,7 @@ use bevy::winit::WinitWindows;
 use bevy_inspector_egui::prelude::*;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use resources::{BoardAssets, SpriteMaterial};
 use winit::window::Icon;
 
 #[cfg(feature = "debug")]
@@ -71,24 +72,20 @@ fn main() {
     #[cfg(feature = "debug")]
     register_custom_types_for_bevy_inspector_egui(&mut app);
 
-    app.insert_resource(BoardOptions {
-        map_size: (20, 20),
-        mine_count: 60,
-        tile_padding: 3.0,
-        safe_start_enabled: true,
-        ..default()
-    });
-
     app.add_state::<AppState>();
     app.add_plugins(BoardPlugin {
         running_state: AppState::InGame,
     });
 
-    app.add_systems(Startup, set_window_icon);
-    app.add_systems(Startup, setup_2d_camera);
-    app.add_systems(Update, make_window_visible_after_startup);
-    app.add_systems(Update, toggle_vsync);
-    app.add_systems(Update, state_handler);
+    app.add_systems(Startup, (set_window_icon, setup_2d_camera, setup_board));
+    app.add_systems(
+        Update,
+        (
+            make_window_visible_after_startup,
+            toggle_vsync,
+            state_handler,
+        ),
+    );
 
     app.run();
 }
@@ -159,4 +156,47 @@ fn state_handler(
             warn!("Wrong state detected. Clear the board with 'C' before regenerating the board")
         }
     }
+}
+
+fn setup_board(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    info!("Setting up the board");
+
+    commands.insert_resource(BoardOptions {
+        map_size: (20, 20),
+        mine_count: 60,
+        tile_padding: 3.0,
+        safe_start_enabled: true,
+        ..default()
+    });
+
+    commands.insert_resource(BoardAssets {
+        label: "Default".into(),
+        board_material: SpriteMaterial {
+            color: Color::BLACK,
+            ..default()
+        },
+        tile_material: SpriteMaterial {
+            color: Color::DARK_GRAY,
+            ..default()
+        },
+        covered_tile_material: SpriteMaterial {
+            color: Color::GRAY,
+            ..default()
+        },
+        mine_counter_colors: BoardAssets::default_colors(),
+        mine_counter_font: asset_server.load("fonts/symtext/Symtext.ttf"),
+        flag_material: SpriteMaterial {
+            color: Color::WHITE,
+            texture: asset_server.load("sprites/Flag.png"),
+        },
+        mine_material: SpriteMaterial {
+            color: Color::WHITE,
+            texture: asset_server.load("sprites/Mine.png"),
+        },
+    });
+
+    info!("Board has been configured");
 }

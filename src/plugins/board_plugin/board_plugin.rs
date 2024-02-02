@@ -4,7 +4,7 @@ use bevy::window::PrimaryWindow;
 
 use crate::components::{Coordinates, Mine, MineNeighbor, Uncover};
 use crate::plugins::{Bounds2, TileTriggerEvent};
-use crate::resources::{Board, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
+use crate::resources::{Board, BoardAssets, BoardOptions, BoardPosition, Tile, TileMap, TileSize};
 use crate::systems::{handle_mouse_input, trigger_event_handler, uncover_tiles};
 use crate::AppState;
 
@@ -35,13 +35,9 @@ impl<T: States> BoardPlugin<T> {
         mut commands: Commands,
         board_options: Option<Res<BoardOptions>>,
         window_query: Query<&Window, With<PrimaryWindow>>,
-        asset_server: Res<AssetServer>,
+        board_assets: Res<BoardAssets>,
     ) {
         let window = window_query.single();
-
-        info!("Loading assets");
-        let font: Handle<Font> = asset_server.load("fonts/symtext/Symtext.ttf");
-        let mine_sprite: Handle<Image> = asset_server.load("sprites/Mine.png");
 
         let options = match board_options {
             Some(o) => *o,
@@ -93,10 +89,11 @@ impl<T: States> BoardPlugin<T> {
                 parent
                     .spawn(SpriteBundle {
                         sprite: Sprite {
-                            color: Color::BLACK,
+                            color: board_assets.board_material.color,
                             custom_size: Some(board_size),
                             ..default()
                         },
+                        texture: board_assets.board_material.texture.clone(),
                         transform: Transform::from_xyz(
                             board_size.x / 2f32,
                             board_size.y / 2f32,
@@ -111,11 +108,8 @@ impl<T: States> BoardPlugin<T> {
                     &tile_map,
                     tile_size,
                     options.tile_padding,
-                    Color::DARK_GRAY,
-                    Color::GRAY,
+                    &board_assets,
                     &mut covered_tiles,
-                    mine_sprite,
-                    font,
                     &mut safe_start,
                 );
             })
@@ -144,11 +138,8 @@ impl<T: States> BoardPlugin<T> {
         tile_map: &TileMap,
         tile_size: f32,
         tile_padding: f32,
-        background_color: Color,
-        covered_tile_color: Color,
+        board_assets: &BoardAssets,
         covered_tiles: &mut HashMap<Coordinates, Entity>,
-        mine_sprite: Handle<Image>,
-        font: Handle<Font>,
         safe_start_entity: &mut Option<Entity>,
     ) {
         for (y, line) in tile_map.iter().enumerate() {
@@ -160,10 +151,11 @@ impl<T: States> BoardPlugin<T> {
 
                 let mut commands = parent.spawn(SpriteBundle {
                     sprite: Sprite {
-                        color: background_color,
+                        color: board_assets.tile_material.color,
                         custom_size: Some(Vec2::splat(tile_size - tile_padding)),
                         ..default()
                     },
+                    texture: board_assets.tile_material.texture.clone(),
                     transform: Transform::from_xyz(
                         (x as f32 * tile_size) + (tile_size / 2f32),
                         (y as f32 * tile_size) + (tile_size / 2f32),
@@ -181,9 +173,10 @@ impl<T: States> BoardPlugin<T> {
                         .spawn(SpriteBundle {
                             sprite: Sprite {
                                 custom_size: Some(Vec2::splat(tile_size - tile_padding)),
-                                color: covered_tile_color,
+                                color: board_assets.covered_tile_material.color,
                                 ..default()
                             },
+                            texture: board_assets.covered_tile_material.texture.clone(),
                             transform: Transform::from_xyz(0f32, 0f32, 2f32),
                             ..default()
                         })
@@ -206,7 +199,7 @@ impl<T: States> BoardPlugin<T> {
                                     ..default()
                                 },
                                 transform: Transform::from_xyz(0f32, 0f32, 1f32),
-                                texture: mine_sprite.clone(),
+                                texture: board_assets.mine_material.texture.clone(),
                                 ..default()
                             });
                         });
@@ -216,7 +209,7 @@ impl<T: States> BoardPlugin<T> {
                         commands.with_children(|parent| {
                             parent.spawn(Self::mine_count_text_bundle(
                                 *mine_count,
-                                font.clone(),
+                                board_assets,
                                 tile_size - tile_padding,
                             ));
                         });
@@ -227,19 +220,16 @@ impl<T: States> BoardPlugin<T> {
         }
     }
 
-    fn mine_count_text_bundle(count: u8, font: Handle<Font>, font_size: f32) -> Text2dBundle {
-        let color = match count {
-            1 => Color::WHITE,
-            2 => Color::GREEN,
-            3 => Color::YELLOW,
-            4 => Color::ORANGE,
-            5 => Color::RED,
-            _ => Color::PURPLE,
-        };
+    fn mine_count_text_bundle(
+        count: u8,
+        board_assets: &BoardAssets,
+        font_size: f32,
+    ) -> Text2dBundle {
+        let color = board_assets.mine_counter_color(count);
 
         let text_style = TextStyle {
             color,
-            font,
+            font: board_assets.mine_counter_font.clone(),
             font_size,
         };
 
