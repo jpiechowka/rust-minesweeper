@@ -28,7 +28,7 @@ strip = true
 panic = "abort"
 
 [dependencies]
-bevy = "0.12"
+bevy = "0.13"
 serde = "1.0.195"
 rand = "0.8.5"
 bevy-inspector-egui = { version = "0.22.1", optional = true }
